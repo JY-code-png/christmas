@@ -808,8 +808,8 @@ function drawStars() {
 
       animation();
     }
-
-
+// --- 从这里开始复制，覆盖掉原来的 myLabels 下面的所有代码 ---
+    
     let myLabels = [
       "Jack yang",
       "Merry Christmas",
@@ -835,29 +835,36 @@ function drawStars() {
         }, 1000 * i);
       }      
     }
-   let init_flag = false;
-// 修改点1：把网址改成具体的文件名 "./bgm.mp3"
-// 修改点2：去掉了引号里开头多余的空格
-let music_url = "./bgm.mp3"; 
 
-let _music = new Audio(music_url);
-_music.loop = true; // 建议加上这一句：让音乐循环播放
+    // 这一段是控制点击和音乐的核心逻辑
+    let init_flag = false;
+    // 音乐文件必须叫 bgm.mp3，并且和网页在同一个地方
+    let music_url = "./bgm.mp3"; 
+    let _music = new Audio(music_url);
+    _music.loop = true; // 循环播放
 
-window.onclick = function() {
-  if(init_flag) return;
-  init_flag = true;
-  _music.play();
-  
-  init();
-  let mask = document.getElementById("mask");
-  mask.remove();
-  createParticles()
-  drawStar();
-  drawMain();
-  mainTl.add(starTl, 0);
-  gsap.globalTimeline.timeScale(1.5); 
-  drawStars();
-}
-  
-  </script>
-</html>
+    window.onclick = function() {
+        if(init_flag) return;
+        init_flag = true;
+        
+        // 尝试播放音乐
+        _music.play().then(() => {
+            console.log("音乐开始播放");
+        }).catch(e => {
+            console.log("音乐播放失败，请检查文件名是否为 bgm.mp3 (全小写)", e);
+        });
+        
+        init();
+        
+        // 移除遮罩层（哪怕音乐没响，这一步也能让你看到圣诞树）
+        let mask = document.getElementById("mask");
+        if(mask) mask.remove();
+        
+        createParticles();
+        drawStar();
+        drawMain();
+        mainTl.add(starTl, 0);
+        gsap.globalTimeline.timeScale(1.5); 
+        drawStars();
+    }
+    // --- 复制到这里结束 ---
