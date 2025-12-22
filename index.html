@@ -8,8 +8,8 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #000510; /* 深蓝黑色背景，更有质感 */
-            font-family: 'Courier New', Courier, monospace; /* 打字机字体 */
+            background-color: #020205; /* 深夜黑背景 */
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,24 +34,25 @@
         #btn-play {
             padding: 15px 40px;
             font-size: 20px;
-            border: 2px solid #0ff;
-            color: #0ff;
+            border: 2px solid #ff3366;
+            color: #ff3366;
             background: transparent;
             border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 0 15px #0ff;
+            box-shadow: 0 0 15px #ff3366;
             animation: breathe 2s infinite;
+            font-weight: bold;
         }
 
         @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 10px #0ff; }
-            50% { box-shadow: 0 0 25px #0ff; transform: scale(1.05); }
+            0%, 100% { box-shadow: 0 0 10px #ff3366; }
+            50% { box-shadow: 0 0 25px #ff3366; transform: scale(1.05); }
         }
 
         /* 祝福语容器 */
         #text-container {
             position: absolute;
-            top: 15%; /* 文字位置 */
+            top: 10%;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -63,16 +64,15 @@
 
         .typing-line {
             font-size: 1.2rem;
-            margin: 10px 0;
-            min-height: 1.5em; /* 占位，防止跳动 */
+            margin: 8px 0;
+            min-height: 1.5em;
             text-shadow: 0 0 5px rgba(255,255,255,0.8);
-            opacity: 0; /* 初始隐藏 */
+            opacity: 0;
             transition: opacity 0.5s;
         }
         
-        /* 特殊颜色的字 */
-        .highlight { color: #FFD700; text-shadow: 0 0 10px #FFD700; font-weight: bold; font-size: 1.5rem;}
-        .name { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.8rem; margin-bottom: 20px;}
+        .highlight { color: #FFD700; text-shadow: 0 0 10px #FFD700; font-weight: bold; font-size: 1.6rem;}
+        .name { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.4rem; margin-bottom: 15px;}
 
         canvas { display: block; }
     </style>
@@ -84,25 +84,26 @@
 
     <!-- 遮罩层 -->
     <div id="overlay">
-        <h1 style="color: #0ff; text-shadow: 0 0 20px #0ff; margin-bottom: 30px;">🎄 Christmas Loading...</h1>
-        <button id="btn-play">点击开启 / CLICK ME</button>
+        <h1 style="color: #ff3366; text-shadow: 0 0 20px #ff3366; margin-bottom: 20px;">🎄 Christmas Party</h1>
+        <p style="color: #ccc; margin-bottom: 30px;">Waiting for you...</p>
+        <button id="btn-play">点我开启 / START</button>
     </div>
 
     <!-- 文字显示区域 -->
     <div id="text-container"></div>
 
     <script>
-        // === 配置区域：在这里修改你的祝福语 ===
+        // === 祝福语配置 ===
         const messages = [
-            { text: "TO: Jack yang", class: "name" }, // 名字
-            { text: "Merry Christmas 🎄", class: "highlight" }, // 标题
+            { text: "TO: Jack yang", class: "name" },
+            { text: "Merry Christmas 🎄", class: "highlight" },
             { text: "愿你平安喜乐，万事胜意 ✨", class: "" },
             { text: "所求皆如愿，日日常欢愉 🍬", class: "" },
             { text: "爱你永远 ❤️", class: "" },
-            { text: "From: fish", class: "name" } // 落款
+            { text: "From: fish", class: "name" }
         ];
 
-        // === 核心逻辑 ===
+        // === 核心变量 ===
         const canvas = document.createElement('canvas');
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
@@ -112,9 +113,8 @@
 
         let w, h;
         let particles = [];
-        let angle = 0; // 旋转角度
+        let angle = 0; 
 
-        // 初始化画布
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
@@ -122,38 +122,27 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // 交互逻辑
+        // 点击交互
         document.getElementById('btn-play').addEventListener('click', () => {
-            // 播放音乐
-            bgm.play().then(() => console.log("BGM playing")).catch(e => console.log(e));
-            
-            // 隐藏遮罩
+            bgm.play().catch(e => console.log(e));
             overlay.style.opacity = '0';
             setTimeout(() => overlay.style.display = 'none', 1000);
-
-            // 开始打字机效果
             startTyping();
         });
 
-        // === 打字机效果函数 ===
+        // 打字机效果
         function startTyping() {
             let lineIndex = 0;
-
             function typeNextLine() {
                 if (lineIndex >= messages.length) return;
-
                 const msgData = messages[lineIndex];
                 const p = document.createElement('p');
                 p.className = `typing-line ${msgData.class || ''}`;
                 textContainer.appendChild(p);
-
-                // 立即显示容器（淡入）
                 requestAnimationFrame(() => p.style.opacity = '1');
 
                 let charIndex = 0;
                 const text = msgData.text;
-                
-                // 逐字打印定时器
                 const timer = setInterval(() => {
                     if (charIndex < text.length) {
                         p.textContent += text.charAt(charIndex);
@@ -161,113 +150,170 @@
                     } else {
                         clearInterval(timer);
                         lineIndex++;
-                        setTimeout(typeNextLine, 800); // 每一行打完后停顿800毫秒再打下一行
+                        setTimeout(typeNextLine, 800);
                     }
-                }, 100); // 打字速度：数值越小越快
+                }, 100);
             }
-
             typeNextLine();
         }
 
-        // === 3D 粒子树逻辑 ===
+        // === 万能粒子类 (树/雪/树干/礼物/人) ===
         class Particle {
             constructor(type) {
-                this.type = type; // 'tree' or 'snow'
+                this.type = type;
                 this.reset();
             }
 
             reset() {
+                // 1. 圣诞树叶子
                 if (this.type === 'tree') {
-                    // 树的逻辑：圆锥螺旋
                     this.angle = Math.random() * Math.PI * 2;
-                    this.hPercent = Math.random(); // 0(底) 到 1(顶)
-                    this.y = h/2 + 200 - this.hPercent * 500; // 高度映射
-                    
-                    // 半径随高度变小
-                    const maxR = 250;
+                    this.hPercent = Math.random(); // 0~1
+                    // 树的高度范围
+                    this.y = h/2 + 150 - this.hPercent * 400; 
+                    const maxR = 200;
                     this.r = (1 - this.hPercent) * maxR; 
                     
-                    // 随机颜色
                     const rand = Math.random();
-                    if (rand > 0.95) {
-                        this.color = '#FF4500'; // 红色礼物/灯球
-                        this.size = 3.5;
-                        this.isDecoration = true;
-                    } else if (rand > 0.9) {
-                        this.color = '#FFD700'; // 金色装饰
-                        this.size = 3;
-                        this.isDecoration = true;
-                    } else {
-                        // 绿色树叶，带有深浅变化
-                        const green = Math.floor(100 + Math.random() * 155);
-                        this.color = `rgba(0, ${green}, 0, 0.8)`;
-                        this.size = 1.5;
-                        this.isDecoration = false;
+                    if (rand > 0.95) { this.color = '#FF4500'; this.size = 3.5; this.isDeco = true; } // 红球
+                    else if (rand > 0.9) { this.color = '#FFD700'; this.size = 3; this.isDeco = true; } // 金球
+                    else { 
+                        const g = Math.floor(100 + Math.random() * 155);
+                        this.color = `rgba(0, ${g}, 0, 0.8)`; 
+                        this.size = 1.5; 
+                        this.isDeco = false;
                     }
-                } else {
-                    // 雪花逻辑
+                } 
+                // 2. 树干 (新增)
+                else if (this.type === 'trunk') {
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.y = h/2 + 150 + Math.random() * 60; // 树底往下延伸
+                    this.r = Math.random() * 30; // 树干粗细
+                    this.color = `rgb(${60 + Math.random()*20}, ${30 + Math.random()*10}, 0)`; // 棕色
+                    this.size = 2;
+                }
+                // 3. 雪花
+                else if (this.type === 'snow') {
                     this.x = Math.random() * w;
                     this.y = Math.random() * h;
-                    this.z = Math.random() * 2 + 0.5; // 速度
+                    this.z = Math.random() * 2 + 0.5;
                     this.size = Math.random() * 2;
                     this.color = 'rgba(255, 255, 255, 0.6)';
+                }
+                // 4. 礼物盒 (新增)
+                else if (this.type === 'gift') {
+                    this.angle = 0.5; // 固定位置
+                    this.r = 100; // 离中心距离
+                    this.y = h/2 + 180; // 放在地上
+                    this.size = 40; // 礼物大小
+                    this.emoji = "🎁";
+                }
+                // 5. 小女孩 (新增)
+                else if (this.type === 'girl1') {
+                    this.angle = 2.5; // 初始角度
+                    this.r = 140; 
+                    this.y = h/2 + 180;
+                    this.size = 35;
+                    this.emoji = "👧";
+                }
+                else if (this.type === 'girl2') {
+                    this.angle = 2.8; // 稍微错开一点，像手拉手
+                    this.r = 140; 
+                    this.y = h/2 + 180;
+                    this.size = 35;
+                    this.emoji = "👧";
                 }
             }
 
             update() {
-                if (this.type === 'tree') {
-                    // 树旋转
-                    this.drawX = w/2 + Math.cos(this.angle + angle) * this.r;
-                    this.drawZ = Math.sin(this.angle + angle) * this.r; // 深度
-                    // 简单的 3D 透视大小变化
-                    this.drawSize = this.size * (1 + this.drawZ / 500); 
-                } else {
-                    // 雪花下落
+                if (this.type === 'snow') {
                     this.y += this.z;
                     if (this.y > h) this.y = -10;
-                    // 雪花横向飘动
                     this.x += Math.sin(Date.now() * 0.001 + this.z) * 0.5;
+                    return;
                 }
+
+                // 旋转逻辑 (树、树干、人、礼物都要转)
+                let currentAngle = this.angle + angle;
+                
+                // 让小女孩跑起来 (额外的公转速度)
+                if (this.type === 'girl1' || this.type === 'girl2') {
+                    currentAngle += angle * 1.5; // 跑得比树转得快
+                }
+
+                this.drawX = w/2 + Math.cos(currentAngle) * this.r;
+                this.drawZ = Math.sin(currentAngle) * this.r; // 深度
+                
+                // 3D透视缩放
+                this.drawSize = this.size * (1 + this.drawZ / 600); 
+                
+                // 透明度随深度变化 (远处的变淡)
+                this.alpha = 0.5 + (this.drawZ + 200) / 400;
+                if(this.alpha > 1) this.alpha = 1;
+                if(this.alpha < 0.2) this.alpha = 0.2;
             }
 
             draw() {
-                if (this.type === 'tree') {
-                    // 树粒子
-                    ctx.beginPath();
-                    ctx.arc(this.drawX, this.y, this.drawSize, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    
-                    // 装饰物加发光效果
-                    if (this.isDecoration) {
-                        ctx.shadowBlur = 10;
-                        ctx.shadowColor = this.color;
-                    } else {
-                        ctx.shadowBlur = 0;
-                    }
-                    ctx.fill();
-                    ctx.shadowBlur = 0; // 重置
-                } else {
-                    // 雪花粒子
+                if (this.type === 'snow') {
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
+                    return;
                 }
+
+                // 绘制 Emoji (礼物/人)
+                if (this.type === 'gift' || this.type.startsWith('girl')) {
+                    ctx.font = `${this.drawSize}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.globalAlpha = this.alpha;
+                    // 左右摇摆动画
+                    let swing = 0;
+                    if(this.type.startsWith('girl')) swing = Math.sin(Date.now() * 0.01) * 5; 
+                    
+                    ctx.save();
+                    ctx.translate(this.drawX, this.y + swing);
+                    ctx.fillText(this.emoji, 0, 0);
+                    ctx.restore();
+                    ctx.globalAlpha = 1;
+                    return;
+                }
+
+                // 绘制圆形粒子 (树/树干)
+                ctx.beginPath();
+                ctx.arc(this.drawX, this.y, this.drawSize, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                
+                if (this.isDeco) {
+                    ctx.shadowBlur = 10 * (1 + this.drawZ / 600);
+                    ctx.shadowColor = this.color;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
             }
         }
 
-        // 初始化粒子
+        // 初始化
         function init() {
-            // 树粒子数量
+            // 1. 树干 (500个粒子)
+            for(let i=0; i<500; i++) particles.push(new Particle('trunk'));
+            // 2. 树叶 (2500个粒子)
             for(let i=0; i<2500; i++) particles.push(new Particle('tree'));
-            // 雪花数量
+            // 3. 礼物 (1个)
+            particles.push(new Particle('gift'));
+            // 4. 小女孩 (2个)
+            particles.push(new Particle('girl1'));
+            particles.push(new Particle('girl2'));
+            // 5. 雪花
             for(let i=0; i<300; i++) particles.push(new Particle('snow'));
         }
 
-        // 顶部的星星
         function drawTopStar() {
             const cx = w/2;
-            const cy = h/2 + 200 - 520; // 树顶高度
+            const cy = h/2 + 150 - 410; // 树顶坐标
             const outerR = 25;
             const innerR = 10;
             const spikes = 5;
@@ -284,23 +330,24 @@
             }
             ctx.closePath();
             ctx.fillStyle = "#FFD700";
-            ctx.shadowBlur = 30;
+            ctx.shadowBlur = 30 + Math.sin(Date.now()*0.005)*10; // 呼吸闪烁
             ctx.shadowColor = "#FFD700";
             ctx.fill();
             ctx.restore();
         }
 
         function animate() {
-            // 清空画布（带透明度拖尾，让旋转更丝滑）
-            ctx.fillStyle = 'rgba(0, 5, 16, 0.4)';
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.6)'; // 拖尾效果
             ctx.fillRect(0, 0, w, h);
 
-            angle += 0.01; // 旋转速度
+            angle += 0.01; // 整体旋转速度
 
-            // 按照深度排序（为了正确的遮挡关系：后面的先画，前面的后画）
+            // 核心技术：Z轴排序 (解决3D遮挡问题)
             particles.sort((a, b) => {
-                if(a.type !== 'tree' || b.type !== 'tree') return 0;
-                return a.drawZ - b.drawZ;
+                // 雪花不参与排序，永远在最上层或最下层
+                if(a.type === 'snow') return -1; 
+                // 其他物体按Z轴深度排序，远的先画，近的后画
+                return (a.drawZ || -9999) - (b.drawZ || -9999);
             });
 
             particles.forEach(p => {
