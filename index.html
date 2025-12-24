@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merry Christmas</title>
+    <title>For Jack Yang</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background: linear-gradient(to bottom, #020111 0%, #191b2e 100%); /* 渐变夜空背景 */
-            font-family: 'Courier New', Courier, monospace;
+            /* 背景调成稍微深邃一点的蓝紫色，适合朋友间的深夜长谈氛围 */
+            background: linear-gradient(to bottom, #090915 0%, #1b1e36 100%);
+            font-family: "Microsoft YaHei", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -21,37 +22,39 @@
         #overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            transition: opacity 1s ease;
+            transition: opacity 1.5s ease;
             cursor: pointer;
         }
         
         #btn-play {
-            padding: 15px 40px;
-            font-size: 20px;
-            border: 2px solid #FFD700;
-            color: #FFD700;
+            padding: 12px 40px;
+            font-size: 18px;
+            border: 2px solid #00BFFF; /* 朋友版用清爽的蓝色边框 */
+            color: #00BFFF;
             background: transparent;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 15px #FFD700;
-            animation: breathe 2s infinite;
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+            animation: breathe 3s infinite;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 10px #FFD700; transform: scale(1); }
-            50% { box-shadow: 0 0 25px #FFD700; transform: scale(1.05); }
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 191, 255, 0.3); transform: scale(1); }
+            50% { box-shadow: 0 0 25px rgba(0, 191, 255, 0.7); transform: scale(1.05); }
         }
 
         /* 祝福语容器 */
         #text-container {
             position: absolute;
-            top: 10%;
+            top: 15%;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -63,45 +66,46 @@
 
         .typing-line {
             font-size: 1.1rem;
-            margin: 8px 0;
+            margin: 10px 0;
             min-height: 1.5em;
-            text-shadow: 0 0 5px rgba(255,255,255,0.8);
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
             opacity: 0;
-            transition: opacity 0.5s;
+            transition: opacity 0.6s ease;
         }
         
-        .highlight { color: #FFD700; text-shadow: 0 0 15px #FFD700; font-weight: bold; font-size: 1.6rem;}
-        .name { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.4rem; margin-bottom: 15px;}
+        /* 样式定制 */
+        .highlight { color: #00BFFF; text-shadow: 0 0 15px #00BFFF; font-weight: bold; font-size: 1.4rem;}
+        .name { color: #FFD700; text-shadow: 0 0 10px #FFD700; font-size: 1.3rem; margin-bottom: 15px; font-weight: bold;}
+        .warm { color: #FFB6C1; font-size: 1.15rem; font-weight: normal; letter-spacing: 1px;} 
 
         canvas { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- 音乐 -->
     <audio id="bgm" src="./bgm.mp3" loop></audio>
 
-    <!-- 遮罩层 -->
     <div id="overlay">
-        <h1 style="color: #FFD700; text-shadow: 0 0 20px #FFD700; margin-bottom: 30px;">🎄 Christmas Story...</h1>
-        <button id="btn-play">点击开启 / CLICK ME</button>
+        <h1 style="color: #00BFFF; text-shadow: 0 0 20px #00BFFF; margin-bottom: 30px; font-size: 22px; letter-spacing: 3px;">HEY, FRIEND</h1>
+        <button id="btn-play">Open Surprise</button>
     </div>
 
-    <!-- 文字显示区域 -->
     <div id="text-container"></div>
 
     <script>
-        // === 1. 祝福语配置 ===
+        // === 1. 祝福语配置 (Jack Yang 专属) ===
         const messages = [
-            { text: "TO: Jack yang", class: "name" },
-            { text: "Merry Christmas 🎄", class: "highlight" },
-            { text: "愿你平安喜乐，万事胜意 ✨", class: "" },
-            { text: "所求皆如愿，日日常欢愉 🍬", class: "" },
-            { text: "爱你永远 ❤️", class: "" },
-            { text: "From: fish", class: "name" }
+            { text: "TO: Jack Yang 🎩", class: "name" },
+            { text: "Merry Christmas! 🎄", class: "highlight" },
+            { text: "这是一个小小的惊喜", class: "" },
+            { text: "有你做我的朋友", class: "warm" },
+            { text: "是我的福气 ✨", class: "warm" },
+            { text: "愿你平安夜快乐", class: "" },
+            { text: "万事胜意，永远开心 🍻", class: "" },
+            { text: "Best Wishes.", class: "highlight" }
         ];
 
-        // === 2. 核心初始化 ===
+        // === 2. 初始化 ===
         const canvas = document.createElement('canvas');
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
@@ -112,25 +116,26 @@
         let w, h;
         let particles = [];
         let angle = 0; 
-        let treeBottomY; // 树底部的Y坐标
+        let treeBottomY; 
 
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
-            treeBottomY = h / 2 + 180; // 统一定义树底位置
+            treeBottomY = h / 2 + 160; 
+            if(h < 600) treeBottomY = h / 2 + 130;
         }
         window.addEventListener('resize', resize);
         resize();
 
-        // 交互：点击播放
         document.getElementById('btn-play').addEventListener('click', () => {
-            bgm.play().catch(e => console.log(e));
+            bgm.play().catch(e => console.log("Audio play failed"));
             overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 1000);
-            startTyping();
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                startTyping();
+            }, 1000);
         });
 
-        // 打字机
         function startTyping() {
             let lineIndex = 0;
             function typeNextLine() {
@@ -149,121 +154,90 @@
                     } else {
                         clearInterval(timer);
                         lineIndex++;
-                        setTimeout(typeNextLine, 800);
+                        setTimeout(typeNextLine, 1000);
                     }
-                }, 100);
+                }, 80);
             }
             typeNextLine();
         }
 
-        // === 3. 场景绘制逻辑 ===
+        // === 3. 场景绘制 ===
 
-        // 树干绘制
         function drawTrunk() {
             const trunkW = 40;
             const trunkH = 60;
             const x = w / 2 - trunkW / 2;
             const y = treeBottomY;
             
-            // 树干渐变
-            const grd = ctx.createLinearGradient(x, y, x + trunkW, y);
-            grd.addColorStop(0, '#5D4037');
-            grd.addColorStop(0.5, '#8D6E63');
-            grd.addColorStop(1, '#5D4037');
-            
-            ctx.fillStyle = grd;
+            // 稍微深一点的木色
+            ctx.fillStyle = '#4e342e'; 
             ctx.fillRect(x, y, trunkW, trunkH);
         }
 
-        // 大礼物绘制
-        function drawBigGift() {
-            const giftX = w / 2 - 30; // 树干左侧一点
-            const giftY = treeBottomY + 20; // 放在地上
-            const size = 50;
+        // 绘制侧边的小礼物
+        function drawSmallSideGift() {
+            const size = 35; // 尺寸改小
+            // 位置：树中心向右偏移 65px (放在树旁边)
+            const giftX = w / 2 + 65; 
+            const giftY = treeBottomY + 25; 
 
-            // 盒子
-            ctx.fillStyle = '#D32F2F'; // 红盒子
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'red';
+            // 盒子 (蓝色系，比较适合送男生)
+            ctx.fillStyle = '#1E88E5'; 
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = '#1E88E5';
             ctx.fillRect(giftX, giftY, size, size * 0.8);
             ctx.shadowBlur = 0;
 
-            // 丝带 (黄色)
-            ctx.fillStyle = '#FFD700';
-            ctx.fillRect(giftX + size/2 - 5, giftY, 10, size * 0.8); // 竖线
-            ctx.fillRect(giftX, giftY + size * 0.4 - 5, size, 10); // 横线
-            
-            // 蝴蝶结
-            ctx.beginPath();
-            ctx.arc(giftX + size/2, giftY, 10, 0, Math.PI * 2);
-            ctx.fill();
+            // 丝带 (银白色)
+            ctx.fillStyle = '#E0E0E0';
+            ctx.fillRect(giftX + size/2 - 4, giftY, 8, size * 0.8); 
+            ctx.fillRect(giftX, giftY + size * 0.4 - 4, size, 8); 
         }
 
-        // 两个小女孩绘制 (用 Canvas 画简单的剪影风)
-        function drawGirls() {
+        // 绘制两个好朋友 (并肩站立)
+        function drawFriends() {
             const centerX = w / 2;
-            const groundY = treeBottomY + 60; // 地面高度
+            const groundY = treeBottomY + 55; 
             
-            // 呼吸动画参数 (让她们轻微摇摆)
             const time = Date.now() * 0.002;
-            const sway = Math.sin(time) * 2; 
+            const sway = Math.sin(time) * 1; 
 
-            // 绘制单个女孩函数
-            function drawGirl(x, height, color, isLeft) {
+            // 绘制人物通用函数
+            function drawDude(offsetX, height, color, isLeft) {
                 ctx.save();
-                ctx.translate(x, groundY);
-                ctx.rotate(sway * 0.02 * (isLeft ? 1 : -1)); // 稍微反向摇摆
+                ctx.translate(centerX + offsetX, groundY);
+                // 微微晃动，像是在随着音乐摆动
+                ctx.rotate(sway * 0.01 * (isLeft ? 1 : 0.5)); 
 
-                // 身体 (梯形裙子)
+                // 身体 (圆润的长方形，像穿着羽绒服)
                 ctx.fillStyle = color;
                 ctx.beginPath();
-                ctx.moveTo(0, -height); // 脖子
-                ctx.lineTo(-15, 0);     // 裙摆左
-                ctx.lineTo(15, 0);      // 裙摆右
-                ctx.closePath();
+                ctx.moveTo(-12, -height);
+                ctx.lineTo(12, -height);
+                ctx.lineTo(15, 0);
+                ctx.lineTo(-15, 0);
                 ctx.fill();
 
-                // 头 (圆)
+                // 头
                 ctx.beginPath();
-                ctx.arc(0, -height - 8, 8, 0, Math.PI * 2);
+                ctx.arc(0, -height - 10, 10, 0, Math.PI * 2);
                 ctx.fill();
-
-                // 胳膊 (牵手)
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(0, -height + 5);
-                // 手臂伸向中间
-                ctx.lineTo(isLeft ? 15 : -15, -height + 10);
-                ctx.stroke();
+                
+                // 围巾 (简单的色块)
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(-10, -height, 20, 4);
 
                 ctx.restore();
             }
 
-            // 女孩 1 (左边) - 稍微粉一点
-            drawGirl(centerX - 60, 45, '#F48FB1', true);
+            // 朋友 A (左边)
+            drawDude(-40, 50, '#5C6BC0', true);
             
-            // 女孩 2 (右边) - 稍微紫一点
-            drawGirl(centerX + 60, 45, '#CE93D8', false);
-
-            // 爱心在她们中间跳动
-            const scale = 1 + Math.sin(time * 3) * 0.2;
-            ctx.save();
-            ctx.translate(centerX, groundY - 40);
-            ctx.scale(scale, scale);
-            ctx.fillStyle = '#FF4081';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#FF4081';
-            ctx.beginPath();
-            // 画心形
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(-5, -5, -10, 0, 0, 10);
-            ctx.bezierCurveTo(10, 0, 5, -5, 0, 0);
-            ctx.fill();
-            ctx.restore();
+            // 朋友 B (右边，靠近中间)
+            drawDude(40, 52, '#26A69A', false);
         }
 
-        // === 4. 粒子系统 (树 + 雪) ===
+        // === 4. 粒子系统 ===
         class Particle {
             constructor(type) {
                 this.type = type; 
@@ -274,25 +248,25 @@
                 if (this.type === 'tree') {
                     this.angle = Math.random() * Math.PI * 2;
                     this.hPercent = Math.random(); 
-                    // 树的高度范围：treeBottomY 往上数 500
                     this.y = treeBottomY - this.hPercent * 500; 
                     
-                    const maxR = 220;
-                    this.r = (1 - this.hPercent) * maxR; // 顶端半径小，底端半径大
+                    const maxR = 200;
+                    this.r = (1 - this.hPercent) * maxR; 
                     
                     const rand = Math.random();
-                    if (rand > 0.96) { // 礼物/彩灯
-                        this.color = `hsl(${Math.random() * 360}, 100%, 60%)`; // 彩色灯
+                    // 朋友版配色：蓝色、金色、白色，更显质感
+                    if (rand > 0.95) { // 亮灯
+                        this.color = `hsl(${Math.random() * 60 + 180}, 100%, 70%)`; // 蓝青色系的灯
+                        this.size = 3.5;
+                        this.isDecoration = true;
+                    } else if (rand > 0.88) { // 装饰球
+                        this.color = '#FFD700'; 
                         this.size = 3;
                         this.isDecoration = true;
-                    } else if (rand > 0.9) { // 金色装饰
-                        this.color = '#FFD700'; 
-                        this.size = 2.5;
-                        this.isDecoration = true;
-                    } else { // 叶子
-                        const green = Math.floor(100 + Math.random() * 155);
-                        this.color = `rgba(0, ${green}, 0, 0.8)`;
-                        this.size = 1.5;
+                    } else { // 树叶
+                        const green = Math.floor(50 + Math.random() * 50);
+                        this.color = `rgba(0, ${green + 60}, ${green}, 0.6)`; // 偏冷色调的绿
+                        this.size = 1.6;
                         this.isDecoration = false;
                     }
                 } else { // 雪花
@@ -300,7 +274,7 @@
                     this.y = Math.random() * h;
                     this.z = Math.random() * 2 + 0.5; 
                     this.size = Math.random() * 2;
-                    this.color = 'rgba(255, 255, 255, 0.6)';
+                    this.color = 'rgba(255, 255, 255, 0.5)';
                 }
             }
 
@@ -312,7 +286,7 @@
                 } else {
                     this.y += this.z;
                     if (this.y > h) this.y = -10;
-                    this.x += Math.sin(Date.now() * 0.001 + this.z) * 0.5;
+                    this.x += Math.sin(Date.now() * 0.001 + this.z) * 0.4;
                 }
             }
 
@@ -321,7 +295,8 @@
                     ctx.beginPath();
                     ctx.arc(this.drawX, this.y, this.drawSize, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
-                    if (this.isDecoration && this.drawZ > 0) { // 只让前面的灯发光
+                    // 只有正面的装饰物才发光
+                    if (this.isDecoration && this.drawZ > 0) { 
                         ctx.shadowBlur = 8;
                         ctx.shadowColor = this.color;
                     } else {
@@ -338,24 +313,28 @@
             }
         }
 
-        // 初始化
         function init() {
-            for(let i=0; i<2800; i++) particles.push(new Particle('tree'));
+            particles = [];
+            for(let i=0; i<3000; i++) particles.push(new Particle('tree'));
             for(let i=0; i<200; i++) particles.push(new Particle('snow'));
         }
 
-        // 顶端大星星
+        // 顶端大星星 (带动画 + LOVE)
         function drawTopStar() {
             const cx = w/2;
-            const cy = treeBottomY - 500; // 树顶
-            const outerR = 25;
-            const innerR = 10;
+            const cy = treeBottomY - 500; 
+            const outerR = 28; // 星星稍大一点
+            const innerR = 14;
             const spikes = 5;
             
             ctx.save();
-            ctx.beginPath();
             ctx.translate(cx, cy);
-            ctx.rotate(-Math.PI / 2);
+            
+            // 动画：左右缓慢摇摆
+            const sway = Math.sin(Date.now() * 0.003) * 0.25;
+            ctx.rotate(-Math.PI / 2 + sway); 
+
+            ctx.beginPath();
             ctx.moveTo(outerR, 0);
             for (let i = 0; i < spikes * 2; i++) {
                 const r = (i % 2 === 0) ? outerR : innerR;
@@ -363,32 +342,40 @@
                 ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
             }
             ctx.closePath();
+            
+            // 星星颜色：明亮的金黄色
             ctx.fillStyle = "#FFD700";
-            ctx.shadowBlur = 30;
-            ctx.shadowColor = "#FFD700";
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
             ctx.fill();
+            
+            // 写上 LOVE
+            ctx.rotate(Math.PI/2); // 转正文字
+            ctx.fillStyle = "#FFFFFF"; // 白色文字
+            ctx.font = "bold 10px Arial"; // 字体加粗
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowBlur = 0; // 文字不要发光，清晰一点
+            ctx.fillText("LOVE", 0, 2); // 微调位置
+
             ctx.restore();
         }
 
-        // 动画循环
         function animate() {
-            ctx.fillStyle = 'rgba(2, 1, 17, 0.6)'; // 拖尾效果
+            ctx.fillStyle = 'rgba(9, 9, 21, 0.5)'; // 拖尾背景色需匹配body背景
             ctx.fillRect(0, 0, w, h);
 
-            angle += 0.01; 
+            angle += 0.008; 
 
-            // 绘制背景层物体 (树干、礼物、人)
             drawTrunk();
-            drawBigGift();
-            drawGirls();
+            drawSmallSideGift(); // 绘制侧边小礼物
+            drawFriends();       // 绘制好朋友剪影
 
-            // 排序粒子 (3D遮挡关系)
             particles.sort((a, b) => {
                 if(a.type !== 'tree' || b.type !== 'tree') return 0;
                 return a.drawZ - b.drawZ;
             });
 
-            // 绘制粒子
             particles.forEach(p => {
                 p.update();
                 p.draw();
